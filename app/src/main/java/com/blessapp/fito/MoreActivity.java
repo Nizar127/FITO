@@ -21,26 +21,26 @@ public class MoreActivity extends AppCompatActivity {
         setContentView(R.layout.activity_more);
 
         bottomtabmenu = findViewById(R.id.bottom_navigation);
-        bottomtabmenu.setSelectedItemId(R.id.frag_more);
+        bottomtabmenu.setSelectedItemId(R.id.more);
 
         displayed = findViewById(R.id.morewords);
         bottomtabmenu.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
-                    case R.id.frag_home:
+                    case R.id.home:
                         startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                         overridePendingTransition(0,0);
                         return true;
-                    case R.id.frag_points:
+                    case R.id.points:
                         startActivity(new Intent(getApplicationContext(), PointsActivity.class));
                         overridePendingTransition(0,0);
                         return true;
-                    case R.id.frag_rewards:
+                    case R.id.rewards:
                         startActivity(new Intent(getApplicationContext(), RewardsActivity.class));
                         overridePendingTransition(0,0);
                         return true;
-                    case R.id.frag_more:
+                    case R.id.more:
                         return true;
                 }
                 return false;

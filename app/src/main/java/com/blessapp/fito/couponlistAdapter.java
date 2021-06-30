@@ -1,5 +1,6 @@
 package com.blessapp.fito;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import com.blessapp.fito.model.coupon;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.squareup.picasso.Picasso;
+
+import static androidx.constraintlayout.motion.widget.MotionScene.TAG;
 
 public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlistAdapter.couponViewHolder>{
     /**
@@ -28,9 +31,11 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
     @Override
     protected void onBindViewHolder(@NonNull couponViewHolder holder, int position, @NonNull coupon model) {
 
-        holder.couponName.setText(model.getName());
-        holder.sponsoredName.setText(model.getSponsoredName());
-        holder.points.setText(model.getPoints());
+        holder.Name.setText(model.getName());
+        Log.d(TAG, "query:"+ holder.Name);
+
+        holder.SponsoredName.setText(model.getSponsoredName());
+        holder.Points.setText(model.getPoints());
         Picasso.get().load(model.getImage()).into(holder.couponImg);
 
     }
@@ -44,15 +49,16 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
 
     class couponViewHolder extends RecyclerView.ViewHolder {
 
-        TextView couponName, sponsoredName, points;
+        TextView Name, SponsoredName, Points;
+        //TextView couponName, sponsoredName, points;
         ImageView couponImg;
         public couponViewHolder(@NonNull View itemView) {
             super(itemView);
 
             couponImg = itemView.findViewById(R.id.couponImage);
-            couponName = itemView.findViewById(R.id.couponName);
-            sponsoredName = itemView.findViewById(R.id.couponSponsoredName);
-            points = itemView.findViewById(R.id.textPoints);
+            Name = itemView.findViewById(R.id.couponName);
+            SponsoredName = itemView.findViewById(R.id.couponSponsoredName);
+            Points = itemView.findViewById(R.id.textPoints);
         }
     }
 }

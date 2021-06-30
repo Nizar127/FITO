@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import static androidx.constraintlayout.motion.widget.MotionScene.TAG;
+
 public class Signup extends AppCompatActivity {
 
     EditText mSignupname,mSignupemail, mSignuppassword;
@@ -33,7 +36,7 @@ public class Signup extends AppCompatActivity {
     DatabaseReference mBase;
     FirebaseAuth fAuth = FirebaseAuth.getInstance();
     ProgressBar progressBar;
-    String username, email, password, productRandomKey, saveCurrentDate,saveCurrentTime;
+    String username, email, password, productRandomKey, saveCurrentDate,saveCurrentTime, USERID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +54,12 @@ public class Signup extends AppCompatActivity {
         //final FirebaseAuth fAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);
 
+/*
         if(fAuth.getCurrentUser() !=null){
             startActivity(new Intent(getApplicationContext(), Login.class));
             finish();
         }
+*/
 
         mContinuebtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +108,7 @@ public class Signup extends AppCompatActivity {
         productRandomKey = saveCurrentDate + saveCurrentTime;
 
 
+
         HashMap<String, Object> userMap = new HashMap<>();
         userMap.put("Username",username);
         userMap.put("Email", email);
@@ -113,11 +119,14 @@ public class Signup extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
 
+                    USERID = fAuth.getCurrentUser().getUid();
+                    Log.d(TAG, "Get Data:" + USERID);
+
                     Toast.makeText(Signup.this,"User Created", Toast.LENGTH_SHORT).show();
 
 
                     //save to firebase
-                    mBase.child(productRandomKey).updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    mBase.child(USERID).updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
@@ -140,8 +149,8 @@ public class Signup extends AppCompatActivity {
         });
     }
 
-    public void login(View view) {
+/*    public void login(View view) {
             Intent intent = new Intent(Signup.this, Login.class);
             startActivity(intent);
-    }
+    }*/
 }

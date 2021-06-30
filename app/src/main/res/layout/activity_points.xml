@@ -53,7 +53,19 @@
         android:layout_marginBottom="504dp"
         android:foregroundGravity="center_vertical|center_horizontal"
         app:cardBackgroundColor="#FFFAE7"
-        app:cardCornerRadius="20dp" />
+        app:cardCornerRadius="20dp">
+
+        <TextView
+            android:id="@+id/trackpoint"
+            android:layout_width="match_parent"
+            android:layout_height="71dp"
+            android:fontFamily="@font/bowlby_one_sc"
+            android:layout_gravity="center_vertical"
+            android:gravity="center|center_horizontal|center_vertical"
+            android:text="@string/how_to_use_fito"
+            android:textColor="#423A30"
+            android:textSize="34sp"/>
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/how"

@@ -27,6 +27,7 @@ public class HomeActivity extends AppCompatActivity {
     String userID;
     Button scannerMe;
     public static TextView qr;
+    TextView powerpoint;
     BottomNavigationView bottomtabmenu;
     DatabaseReference ref;
     FirebaseAuth fAuth = FirebaseAuth.getInstance();
@@ -38,13 +39,34 @@ public class HomeActivity extends AppCompatActivity {
 
         qr = findViewById(R.id.qrtext);
 
-        ref = FirebaseDatabase.getInstance().getReference("User");
+        powerpoint = findViewById(R.id.pinpointID);
+
+
 
         //GET ID of user
        userID = fAuth.getCurrentUser().getUid();
+        Log.d(TAG, "query:"+ userID);
 
-       Query qrcode = ref.child(userID);
-       qrcode.addValueEventListener(new ValueEventListener() {
+        ref = FirebaseDatabase.getInstance().getReference("User").child(userID);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String importData = dataSnapshot.child("points").getValue().toString();
+               powerpoint.setText(importData);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        Query qrcode = ref.child(userID);
+        Log.d(TAG, "query:"+ qrcode);
+
+/*       qrcode.addValueEventListener(new ValueEventListener() {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.exists()){
@@ -62,12 +84,12 @@ public class HomeActivity extends AppCompatActivity {
            public void onCancelled(@NonNull DatabaseError error) {
 
            }
-       });
+       });*/
 
         scannerMe = findViewById(R.id.scanbutton);
 
         bottomtabmenu = findViewById(R.id.bottom_navigation);
-        bottomtabmenu.setSelectedItemId(R.id.frag_home);
+        bottomtabmenu.setSelectedItemId(R.id.home);
 
 
         //getSupportFragmentManager().beginTransaction().replace(R.id.container_fragment, new HomeActivity()).commit();
@@ -80,31 +102,29 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-
-            bottomtabmenu.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-
-                    switch (item.getItemId()) {
-                        case R.id.frag_points:
-                            startActivity(new Intent(getApplicationContext(), PointsActivity.class));
-                            overridePendingTransition(0, 0);
-                            Log.d(TAG, "saveImage:" + item.getItemId());
-                            return true;
-                        case R.id.frag_rewards:
-                            startActivity(new Intent(getApplicationContext(), RewardsActivity.class));
-                            overridePendingTransition(0, 0);
-                            return true;
-                        case R.id.frag_more:
-                            startActivity(new Intent(getApplicationContext(), MoreActivity.class));
-                            overridePendingTransition(0, 0);
-                            return true;
-                        case R.id.frag_home:
-                            return true;
-                    }
-                    return false;
+        bottomtabmenu.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.points:
+                        startActivity(new Intent(getApplicationContext(), PointsActivity.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.rewards:
+                        startActivity(new Intent(getApplicationContext(), RewardsActivity.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.more:
+                        startActivity(new Intent(getApplicationContext(), MoreActivity.class));
+                        overridePendingTransition(0, 0);
+                        return true;
+                    case R.id.home:
+                        return true;
                 }
-            });
+                return false;
+            }
+        });
+
+
     }
 }
