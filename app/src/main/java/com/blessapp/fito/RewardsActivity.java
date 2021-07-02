@@ -36,6 +36,7 @@ public class RewardsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RewardsActivity.this, Coupon_Redemption.class);
+                //Intent intent = new Intent(RewardsActivity.this, couponDetailActivity.class);
                 startActivity(intent);
             }
         });

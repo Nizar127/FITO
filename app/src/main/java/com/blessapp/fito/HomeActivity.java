@@ -1,6 +1,7 @@
 package com.blessapp.fito;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -29,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
     public static TextView qr;
     TextView powerpoint;
     BottomNavigationView bottomtabmenu;
-    DatabaseReference ref;
+    DatabaseReference ref, checkData;
     FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
     @Override
@@ -48,19 +51,39 @@ public class HomeActivity extends AppCompatActivity {
         Log.d(TAG, "query:"+ userID);
 
         ref = FirebaseDatabase.getInstance().getReference("User").child(userID);
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String importData = dataSnapshot.child("points").getValue().toString();
-               powerpoint.setText(importData);
+        try{
+            checkData = FirebaseDatabase.getInstance().getReference("User").child(userID);
+            checkData.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if(task.getResult().exists()){
+                        Log.d(TAG, "check data:"+ checkData);
+                        checkData.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Object importData = dataSnapshot.child("points").getValue();
+                                if(importData != null){
+                                    powerpoint.setText(importData.toString());
+                                }
 
-            }
+                            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                            }
+                        });
+                    }
+                }
+            });
+
+        }catch (Exception e){
+            Log.d(TAG, "Error: "+e);
+        }
+
+
+
+
 
 
         Query qrcode = ref.child(userID);

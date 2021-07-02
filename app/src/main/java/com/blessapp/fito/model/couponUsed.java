@@ -1,9 +1,6 @@
 package com.blessapp.fito.model;
 
-import java.util.Date;
-
-public class coupon {
-    private String pid;
+public class couponUsed {
     private String name;
     private String image;
     private String points;
@@ -14,9 +11,7 @@ public class coupon {
     private String coupon_validity;
     private String date_added;
 
-
-    public coupon(String pid,String name, String image, String points, String sponsoredName, String sponsoredTerm, String sponsoredContact, String sponsoredHighlight, String coupon_validity, String date_added) {
-        this.pid = pid;
+    public couponUsed(String name, String image, String points, String sponsoredName, String sponsoredTerm, String sponsoredContact, String sponsoredHighlight, String coupon_validity, String date_added) {
         this.name = name;
         this.image = image;
         this.points = points;
@@ -28,16 +23,8 @@ public class coupon {
         this.date_added = date_added;
     }
 
-    public coupon() {
+    public couponUsed(){
 
-    }
-
-    public String getPid() {
-        return pid;
-    }
-
-    public void setPid(String pid) {
-        this.pid = pid;
     }
 
     public String getName() {
@@ -103,7 +90,6 @@ public class coupon {
     public void setCoupon_validity(String coupon_validity) {
         this.coupon_validity = coupon_validity;
     }
-
 
     public String getDate_added() {
         return date_added;

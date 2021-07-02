@@ -19,14 +19,19 @@ import com.blessapp.fito.model.coupon;
 import com.blessapp.fito.model.myviewholder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.firebase.ui.database.SnapshotParser;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
+import java.util.Map;
 
 import static androidx.constraintlayout.motion.widget.MotionScene.TAG;
 
@@ -35,7 +40,7 @@ public class Coupon_Redemption extends AppCompatActivity {
     TextView points;
     RecyclerView recyclerView;
     couponlistAdapter Adapter;
-    DatabaseReference mBase, couponDB;
+    DatabaseReference mBase, couponDB, checkData;
     FirebaseDatabase firebaseDatabase;
     coupon coupon;
     String userID;
@@ -52,20 +57,41 @@ public class Coupon_Redemption extends AppCompatActivity {
 
         userID = FirebaseAuth.getInstance().getUid();
         coupon = new coupon();
+
+
         mBase = FirebaseDatabase.getInstance().getReference("Coupon");
         couponDB = FirebaseDatabase.getInstance().getReference("User").child(userID);
-        couponDB.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String thepoint = dataSnapshot.child("points").getValue().toString();
-                points.setText(thepoint);
-            }
+        try{
+            checkData = FirebaseDatabase.getInstance().getReference("User").child(userID);
+            checkData.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if(task.getResult().exists()){
+                        Log.d(TAG, "check data:"+ checkData);
+                        checkData.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Object importData = dataSnapshot.child("points").getValue();
+                                if(importData != null){
+                                    points.setText(importData.toString());
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                                }
 
-            }
-        });
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+            });
+
+        }catch (Exception e){
+            Log.d(TAG, "Error: "+e);
+        }
+
         Log.d(TAG, "user:"+ userID);
 
 
@@ -76,53 +102,39 @@ public class Coupon_Redemption extends AppCompatActivity {
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
       FirebaseRecyclerOptions<coupon> options = new FirebaseRecyclerOptions.Builder<coupon>()
-                .setQuery(mBase, coupon.class)
+                //.setQuery(mBase, GenericTypeIndicator.class)
+              .setQuery(mBase, new SnapshotParser<com.blessapp.fito.model.coupon>() {
+                  @NonNull
+                  @Override
+                  public com.blessapp.fito.model.coupon parseSnapshot(@NonNull DataSnapshot snapshot) {
+                      coupon coupondata = new coupon();
+                      coupondata.setName(snapshot.child("Coupon_name").getValue().toString());
+                      coupondata.setSponsoredName(snapshot.child("Sponsored_Name").getValue().toString());
+                      coupondata.setImage(snapshot.child("image").getValue().toString());
+                      coupondata.setPoints(snapshot.child("Points").getValue().toString());
+                      return coupondata;
+                  }
+              })
                 .build();
 
 
-        //Adapter = new couponlistAdapter(options);
-        //Adapter = new couponAdapter(mycoupon);
-      //  recyclerView.setAdapter(Adapter);
-        //Adapter.notifyDataSetChanged();
+        Adapter = new couponlistAdapter(options);
+       // Adapter = new couponlistAdapter();
+       recyclerView.setAdapter(Adapter);
+        Adapter.notifyDataSetChanged();
 
 
+    }
+
+        @Override
+    protected void onStop() {
+        super.onStop();
+        Adapter.stopListening();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseRecyclerOptions<coupon> options =
-            new FirebaseRecyclerOptions.Builder<coupon>()
-            .setQuery(mBase, coupon.class)
-            .build();
-
-        FirebaseRecyclerAdapter<coupon, myviewholder> adapter =
-                new FirebaseRecyclerAdapter<coupon, myviewholder>(options) {
-                    @Override
-                    protected void onBindViewHolder(@NonNull final myviewholder holder, int position, @NonNull com.blessapp.fito.model.coupon model) {
-                       // holder.Sponsored.
-                    }
-
-                    @NonNull
-                    @Override
-                    public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.coupon_ui,parent,false);
-                        myviewholder holder = new myviewholder(view);
-                        return holder;
-                    }
-
-                };
-
-
-
-
-
+        Adapter.startListening();
     }
-
-    /*    @Override
-    protected void onStop() {
-        super.onStop();
-        Adapter.stopListening();
-    }*/
-
 }

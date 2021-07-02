@@ -28,7 +28,7 @@ public class PointsActivity extends AppCompatActivity {
     BottomNavigationView bottomtabmenu;
     CardView pointsItem, redeemBox, earnBox;
     TextView therealPoint;
-    DatabaseReference ref;
+    DatabaseReference ref, checkData;
     FirebaseAuth fAuth = FirebaseAuth.getInstance();
     String UserID = "";
     String touch = "";
@@ -54,6 +54,36 @@ public class PointsActivity extends AppCompatActivity {
 
 
         ref = FirebaseDatabase.getInstance().getReference("User").child(UserID);
+        try{
+            checkData = FirebaseDatabase.getInstance().getReference("User").child(UserID);
+            checkData.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if(task.getResult().exists()){
+                        Log.d(TAG, "check data:"+ checkData);
+                        checkData.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Object importData = dataSnapshot.child("points").getValue();
+                                if(importData != null){
+                                    therealPoint.setText(importData.toString());
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+            });
+
+        }catch (Exception e){
+            Log.d(TAG, "Error: "+e);
+        }
+/*
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -66,6 +96,7 @@ public class PointsActivity extends AppCompatActivity {
 
             }
         });
+*/
 
 /*        ref.child(UserID).child("points").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
