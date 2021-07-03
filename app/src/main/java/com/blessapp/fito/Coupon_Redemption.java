@@ -51,7 +51,9 @@ public class Coupon_Redemption extends AppCompatActivity {
         setContentView(R.layout.activity_coupon__redemption);
 
 
-
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Coupon");
+        String key = dbRef.child("Coupon").push().getKey();
+        Log.d(TAG, "query:"+ key);
         //coupon = findViewById(R.id.couponBtn);
         points = findViewById(R.id.pointID);
 

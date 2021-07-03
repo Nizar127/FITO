@@ -49,7 +49,7 @@ public class MoreActivity extends AppCompatActivity {
         bottomtabmenu.setSelectedItemId(R.id.more);
 
         //coupon = findViewById(R.id.couponBtn);
-        pointMore = findViewById(R.id.pointItemSystem);
+        pointMore = findViewById(R.id.pinpointID);
 
         userID = FirebaseAuth.getInstance().getUid();
         //coupon = new coupon();
@@ -99,10 +99,11 @@ public class MoreActivity extends AppCompatActivity {
                     @Override
                     public com.blessapp.fito.model.couponUsed parseSnapshot(@NonNull DataSnapshot snapshot) {
                         couponUsed coupondata = new couponUsed();
+                        //couponUsed coupondata = new couponUsed();
                         coupondata.setName(snapshot.child("Coupon_name").getValue().toString());
                         coupondata.setSponsoredName(snapshot.child("Sponsored_Name").getValue().toString());
                         coupondata.setImage(snapshot.child("image").getValue().toString());
-                        coupondata.setPoints(snapshot.child("Coupon_Points").getValue().toString());
+                        coupondata.setPoints(snapshot.child("Points").getValue().toString());
                         return coupondata;
                     }
                 })

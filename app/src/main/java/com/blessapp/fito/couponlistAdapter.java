@@ -25,9 +25,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,8 +46,12 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
 
     String initialData = "";
     String currentData = "";
+    String bigPoints = "";
+    String smallPoints = "";
     String storeData = "";
     int totalData = 0;
+    Boolean completeSearch = false;
+    Boolean completeSearch2 = false;
     public couponlistAdapter(@NonNull FirebaseRecyclerOptions<coupon> options) {
         super(options);
     }
@@ -64,7 +71,9 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(),couponDetailActivity.class);
                 Log.d(TAG, "intent:"+ intent);
+                String detailKey = getRef(position).getKey();
                 intent.putExtra("pid", model.getPid());
+                intent.putExtra("key", detailKey);
                 v.getContext().startActivity(intent);
                 //startActivity();
 
@@ -77,7 +86,7 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
             public void onClick(View v) {
                 CharSequence theoptions[] = new CharSequence[]{
                         "Yes",
-                        "No"
+                        "No",
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
@@ -87,113 +96,280 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
                     public void onClick(DialogInterface dialog, int which) {
                         if(which == 0){
                             //if yes, then button will be disable
-                            Toast.makeText(v.getContext(), "Redeem Successful", Toast.LENGTH_SHORT).show();
-                            String UserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("User").child(UserID).child("redeem_points");
-                            DatabaseReference userIntialRef = FirebaseDatabase.getInstance().getReference("User").child(UserID);
-                            DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Coupon");
-                            dbRef.addValueEventListener(new ValueEventListener() {
+                            //get data from user
+                            //get data from coupon
+                            //create calculation
+                            //save into database
+                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("User");
+                            String userData = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                            userRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                                 @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    Log.d(TAG, "user data is it exist"+ task);
+                                    if(task.getResult().exists()){
 
-                                    userIntialRef.addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            Object importData = snapshot.child("points").getValue();
-                                            if(importData != null){
-                                                Log.d(TAG, "check data:"+ importData);
-                                                initialData = importData.toString();
-                                                //therealPoint.setText(importData.toString());
+                                        Log.d(TAG, "user task exist:"+ task);
+                                        userRef.child(userData).addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                Log.d(TAG, "user snapshot:"+ snapshot);
+                                                Object startData = snapshot.child("points").getValue();
+                                                if(startData != null){
+                                                    Log.d(TAG, "yeahdata:"+ startData);
+                                                    String currentPoint ="";
+                                                    currentPoint = startData.toString();
+                                                    initialData = currentPoint;
+
+                                                    Calendar calendar = Calendar.getInstance();
+
+                                                    SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
+                                                    String saveCurrentDate = currentDate.format(calendar.getTime());
+
+                                                    SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss a");
+                                                    String saveCurrentTime = currentTime.format(calendar.getTime());
+
+                                                    //To create a unique product random key, so that it doesn't overwrite other product
+                                                    String productRandomKey = saveCurrentDate + saveCurrentTime;
+
+
+                                                    DatabaseReference tempdata = FirebaseDatabase.getInstance().getReference("calculateData").child(productRandomKey).child(userData);
+                                                    HashMap<String, Object> usercalcMap = new HashMap<>();
+                                                    usercalcMap.put("first_points",initialData);
+
+                                                    tempdata.updateChildren(usercalcMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            Log.d(TAG, "Data Inserted:"+ task);
+
+                                                        }
+                                                    });
+
+                                                    Log.d(TAG, "latest Initial Data:"+ initialData);
+                                                    //therealPoint.setText(importData.toString());
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
 
                                             }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-
-                                    dbRef.child(UserID).addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            Object importsecondData = snapshot.child("points").getValue();
-                                            if(importsecondData != null){
-                                                Log.d(TAG, "check data:"+ importsecondData);
-                                                currentData = importsecondData.toString();
-                                                //therealPoint.setText(importData.toString());
-
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-
-                                    //store new value
-
-                                    if(Integer.parseInt(initialData) >= Integer.parseInt(currentData)){
-                                        totalData = Integer.parseInt(initialData) - Integer.parseInt(currentData);
-                                    }else{
-                                        Toast.makeText(v.getContext(), "Your Total Point are not enough", Toast.LENGTH_SHORT).show();
+                                        });
                                     }
-                                    storeData = String.valueOf(totalData);
-
-                                    Object datapoints = snapshot.child("points").getValue();
-                                    Object dataCoupon = snapshot.child("Coupon_name").getValue();
-                                    Object dataHighlights = snapshot.child("Coupon_Highlight").getValue();
-                                    Object dataTerm = snapshot.child("Coupon_Term").getValue();
-                                    Object dataContact = snapshot.child("Coupon_Contact").getValue();
-                                    Object dataSponsoredName = snapshot.child("Sponsored_Name").getValue();
-                                    Object dataValidity = snapshot.child("Coupon_Validity").getValue();
-                                    Object dataImage = snapshot.child("image").getValue();
-                                    Object pid = snapshot.child("pid").getValue();
-
-
-                                    HashMap<String, Object> userMap = new HashMap<>();
-                                    userMap.put("PID", UserID);
-                                    userMap.put("Coupon_name",dataCoupon);
-                                    userMap.put("Coupon_Highlight",dataHighlights);
-                                    userMap.put("Coupon_Term",dataTerm);
-                                    userMap.put("Coupon_Contact",dataContact);
-                                    userMap.put("Sponsored_Name",dataSponsoredName);
-                                    userMap.put("image",dataImage);
-                                    userMap.put("Coupon_Points",datapoints);
-                                    userMap.put("Coupon_Validity",dataValidity);
-                                    userMap.put("points",storeData);
-                                    //userMap.put("Coupon_Points",datapoints)
-
-                                    //update data into it
-                                    userRef.child(UserID).updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            //disabled button
-                                            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                                            builder.setTitle("Coupon To Be Redeem Has Been Add To Your Profile");
-                                            //Toast.makeText(v.getContext(), "Data Has Been Uploaded", Toast.LENGTH_SHORT).show();
-                                            holder.redeem.setEnabled(false);
-                                        }
-                                    });
-
-
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
 
                                 }
                             });
+
+                            DatabaseReference couponRef = FirebaseDatabase.getInstance().getReference("Coupon");
+                            //String key = dbRef.child("Coupon").push().getKey();
+                            String key = getRef(position).getKey();
+                            Log.d(TAG, "query:"+ key);
+                            couponRef.child(key).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    if(task.getResult().exists()){
+                                        Log.d(TAG, "taskexist:"+ task);
+
+                                        couponRef.child(key).addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                Log.d(TAG, "search coupon:"+snapshot);
+                                                Object importData = snapshot.child("Points").getValue();
+                                                if(importData != null){
+                                                    Log.d(TAG, "importdata:"+ importData);
+                                                    String initialPoint ="";
+                                                    initialPoint = importData.toString();
+                                                    currentData = initialPoint;
+
+                                                    Calendar calendar = Calendar.getInstance();
+
+                                                    SimpleDateFormat currentDate = new SimpleDateFormat("MMM dd, yyyy");
+                                                    String saveCurrentDate = currentDate.format(calendar.getTime());
+
+                                                    SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss a");
+                                                    String saveCurrentTime = currentTime.format(calendar.getTime());
+
+                                                    //To create a unique product random key, so that it doesn't overwrite other product
+                                                    String productRandomKey = saveCurrentDate + saveCurrentTime;
+
+                                                    DatabaseReference tempdata = FirebaseDatabase.getInstance().getReference("calculateData").child(productRandomKey).child(userData);
+                                                    HashMap<String, Object> usercalcMap = new HashMap<>();
+                                                    usercalcMap.put("second_points",currentData);
+
+                                                    tempdata.updateChildren(usercalcMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            Log.d(TAG, "Data Inserted Secondary:"+ task);
+                                                        }
+                                                    });
+
+                                                    Log.d(TAG, "latest current data:"+ currentData);
+
+                                                    tempdata.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                            if(task.getResult().exists()){
+                                                                Log.d(TAG, "latest data:"+ task);
+                                                                tempdata.addValueEventListener(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                                        Log.d(TAG, "temp data:"+snapshot);
+                                                                        Object firstPoints = snapshot.child("first_points").getValue();
+                                                                        Object secondPoints = snapshot.child("second_points").getValue();
+                                                                        if(firstPoints != null && secondPoints != null){
+                                                                            Log.d(TAG, "points 1:"+ firstPoints);
+                                                                            Log.d(TAG, "points 2:"+ secondPoints);
+
+                                                                            String initialPoint ="";
+                                                                            initialPoint = firstPoints.toString();
+                                                                            bigPoints = initialPoint;
+                                                                            Log.d(TAG, "Big Points:"+ bigPoints);
+
+
+                                                                            String secondaryPoint = "";
+                                                                            secondaryPoint = secondPoints.toString();
+                                                                            smallPoints = secondaryPoint;
+                                                                            Log.d(TAG, "Small Points:"+ smallPoints);
+
+                                                                            if(Integer.parseInt(bigPoints) >= Integer.parseInt(smallPoints)){
+
+                                                                                totalData = Integer.parseInt(bigPoints) - Integer.parseInt(smallPoints);
+                                                                                storeData = String.valueOf(totalData);
+                                                                                Log.d(TAG, "Total Data:"+ storeData);
+
+                                                                                String theuserData = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                                                                Log.d(TAG, "The User Data:"+ theuserData);
+                                                                                DatabaseReference userInitialRef = FirebaseDatabase.getInstance().getReference("User").child(theuserData);
+                                                                                userInitialRef.child("points").setValue(storeData);
+
+                                                                                Toast.makeText(v.getContext(), "Redeem Successful", Toast.LENGTH_SHORT).show();
+
+                                                                                String CouponDataKey = getRef(position).getKey();
+                                                                                DatabaseReference getCouponRef =FirebaseDatabase.getInstance().getReference("Coupon").child(CouponDataKey);
+                                                                                getCouponRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                                                    @Override
+                                                                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                                                        if(task.getResult().exists()){
+                                                                                            getCouponRef.addValueEventListener(new ValueEventListener() {
+                                                                                                @Override
+                                                                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                                                                                    String getIDData = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                                                                                    Object Highlight = snapshot.child("Coupon_Highlight").getValue();
+                                                                                                    Object SponsoredName = snapshot.child("Sponsored_Name").getValue();
+                                                                                                    Object points = snapshot.child("Points").getValue();
+                                                                                                    Object Name = snapshot.child("Coupon_name").getValue();
+                                                                                                    Object Contact = snapshot.child("Coupon_Contact").getValue();
+                                                                                                    Object Term = snapshot.child("Coupon_Term").getValue();
+                                                                                                    Object Validity = snapshot.child("Coupon_Validity").getValue();
+                                                                                                    Object Image = snapshot.child("image").getValue();
+
+                                                                                                    DatabaseReference redeemPointsRef = FirebaseDatabase.getInstance().getReference("User").child(theuserData).child("redeem_points");
+                                                                                                    HashMap<String, Object> productMap = new HashMap<>();
+                                                                                                    productMap.put("pid", getIDData);
+                                                                                                    productMap.put("image", Image);
+                                                                                                    productMap.put("Coupon_name", Name);
+                                                                                                    productMap.put("Coupon_Highlight", Highlight);
+                                                                                                    productMap.put("Coupon_Term", Term);
+                                                                                                    productMap.put("Coupon_Contact", Contact);
+                                                                                                    productMap.put("Sponsored_Name", SponsoredName);
+                                                                                                    productMap.put("Coupon_Validity", Validity);
+                                                                                                    productMap.put("Points", points);
+
+                                                                                                    redeemPointsRef.updateChildren(productMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                                        @Override
+                                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                                            holder.redeem.setEnabled(false);
+
+                                                                                                        }
+                                                                                                    });
+                                                                                                }
+
+                                                                                                @Override
+                                                                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                    }
+                                                                                });
+
+/*                                                                                HashMap<String, Object> userReadMap = new HashMap<>();
+                                                                                userReadMap.put("points",storeData);
+
+                                                                                userInitialRef.updateChildren(userReadMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                        Toast.makeText(v.getContext(), "Redeem Successful", Toast.LENGTH_SHORT).show();
+                                                                                        holder.redeem.setEnabled(false);
+                                                                                    }
+                                                                                });*/
+                                                                            }else{
+                                                                                Toast.makeText(v.getContext(), "Your Points Are Not Enough", Toast.LENGTH_SHORT).show();
+
+                                                                            }
+                                                                    }}
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    });
+
+                                                    //therealPoint.setText(importData.toString());
+                                                }
+                                            }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
+
+
 
 
                         }
                         if(which == 1){
                             Toast.makeText(v.getContext(), "Redeem Cancelled", Toast.LENGTH_SHORT).show();
 
-
-
                         }
+                        if(which == 2){
+                            DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Coupon");
+                            //String key = dbRef.child("Coupon").push().getKey();
+                            String key = getRef(position).getKey();
+                            Log.d(TAG, "query:"+ key);
+                            dbRef.child(key).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    if(task.getResult().exists()){
+                                        dbRef.child(key).addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                Object importData = snapshot.child("Points").getValue();
+                                                if(importData != null){
+                                                    Log.d(TAG, "importdata:"+ importData);
+
+                                                    //therealPoint.setText(importData.toString());
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+
+
                     }
                 });
                 builder.show();

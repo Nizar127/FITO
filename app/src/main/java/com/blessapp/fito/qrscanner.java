@@ -74,14 +74,22 @@ public class qrscanner extends AppCompatActivity implements ZXingScannerView.Res
     public void handleResult(Result rawResult) {
         //String data=rawResult.getText().toString();
         String data = rawResult.getText();
+        String newPoints = "";
+        String initialPoints = "";
         HashMap<String, Object> userMap = new HashMap<>();
         userMap.put("points",data);
+        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference scannerDataRef = FirebaseDatabase.getInstance().getReference("User").child(userID).child("points");
+
         dbref.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                    HomeActivity.qr.setText(data);
             }
         });
+
+
+
 /*        dbref.push().setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
