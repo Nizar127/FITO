@@ -66,7 +66,7 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
         holder.Points.setText(model.getPoints());
         Picasso.get().load(model.getImage()).into(holder.couponImg);
         //String postKey = articleModel.get(position).getKey();
-        holder.detailBtn.setOnClickListener(new View.OnClickListener() {
+        /*holder.detailBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(),couponDetailActivity.class);
@@ -78,7 +78,7 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
                 //startActivity();
 
             }
-        });
+        });*/
 
 
         holder.redeem.setOnClickListener(new View.OnClickListener() {
