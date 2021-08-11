@@ -55,6 +55,10 @@ public class RewardsActivity extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), PointsActivity.class));
                         overridePendingTransition(0,0);
                         return true;
+                    case R.id.profileID:
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                        overridePendingTransition(0,0);
+                        return true;
                     case R.id.more:
                         startActivity(new Intent(getApplicationContext(), MoreActivity.class));
                         overridePendingTransition(0,0);

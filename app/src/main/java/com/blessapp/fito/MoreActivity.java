@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blessapp.fito.model.coupon;
@@ -31,13 +33,8 @@ public class MoreActivity extends AppCompatActivity {
 
     BottomNavigationView bottomtabmenu;
     TextView displayed;
-    TextView pointMore;
-    RecyclerView recyclerViewMore;
-    CouponUsedAdapter couponAdapter;
-    couponUsed couponUsed;
-    DatabaseReference mBase, couponDB, checkData;
-    FirebaseDatabase firebaseDatabase;
-    com.blessapp.fito.model.coupon coupon;
+    LinearLayout redeemClick;
+
     String userID;
 
     @Override
@@ -48,70 +45,23 @@ public class MoreActivity extends AppCompatActivity {
         bottomtabmenu = findViewById(R.id.bottom_navigation);
         bottomtabmenu.setSelectedItemId(R.id.more);
 
+        userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        redeemClick = findViewById(R.id.redeemSystem);
+
+        redeemClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MoreActivity.this, redeemActivity.class);
+                startActivity(intent);
+            }
+        });
+
         //coupon = findViewById(R.id.couponBtn);
-        pointMore = findViewById(R.id.pinpointID);
 
-        userID = FirebaseAuth.getInstance().getUid();
-        //coupon = new coupon();
-        couponUsed = new couponUsed();
 
-        mBase = FirebaseDatabase.getInstance().getReference("User").child(userID).child("redeem_points");
 
-        try{
-            checkData = FirebaseDatabase.getInstance().getReference("User").child(userID);
-            checkData.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    if(task.getResult().exists()){
-                        Log.d(TAG, "check data:"+ checkData);
-                        checkData.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Object importData = dataSnapshot.child("points").getValue();
-                                if(importData != null){
-                                    pointMore.setText(importData.toString());
 
-                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
-                }
-            });
-
-        }catch (Exception e){
-            Log.d(TAG, "Error: "+e);
-        }
-
-        displayed = findViewById(R.id.morewords);
-
-        recyclerViewMore = findViewById(R.id.recyclerviewMore);
-        recyclerViewMore.setLayoutManager(new LinearLayoutManager(this));
-
-        FirebaseRecyclerOptions<couponUsed> options = new FirebaseRecyclerOptions.Builder<couponUsed>()
-                .setQuery(mBase, new SnapshotParser<com.blessapp.fito.model.couponUsed>() {
-                    @NonNull
-                    @Override
-                    public com.blessapp.fito.model.couponUsed parseSnapshot(@NonNull DataSnapshot snapshot) {
-                        couponUsed coupondata = new couponUsed();
-                        //couponUsed coupondata = new couponUsed();
-                        coupondata.setName(snapshot.child("Coupon_name").getValue().toString());
-                        coupondata.setSponsoredName(snapshot.child("Sponsored_Name").getValue().toString());
-                        coupondata.setImage(snapshot.child("image").getValue().toString());
-                        coupondata.setPoints(snapshot.child("Points").getValue().toString());
-                        return coupondata;
-                    }
-                })
-                .build();
-
-        couponAdapter = new CouponUsedAdapter(options);
-        recyclerViewMore.setAdapter(couponAdapter);
-        couponAdapter.notifyDataSetChanged();
 
 
         bottomtabmenu.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -130,6 +80,10 @@ public class MoreActivity extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), RewardsActivity.class));
                         overridePendingTransition(0,0);
                         return true;
+                    case R.id.profileID:
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                        overridePendingTransition(0,0);
+                        return true;
                     case R.id.more:
                         return true;
                 }
@@ -138,15 +92,5 @@ public class MoreActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        couponAdapter.startListening();
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        couponAdapter.stopListening();
-    }
 }

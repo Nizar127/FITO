@@ -43,6 +43,32 @@
 
         </LinearLayout>
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            >
+            <TextView
+                android:id="@+id/couponusedHighlight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="dad"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            >
+            <TextView
+                android:id="@+id/couponusedTerm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="dad"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+        <LinearLayout
             android:id="@+id/pointsLine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,6 +94,18 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:padding="5dp"/>
+            <TextView
+                android:id="@+id/couponValidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="dada"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginStart="200dp"
+                android:textColor="@color/purple_500"
+                android:padding="5dp"/>
+
+
 
         </LinearLayout>
         <Button

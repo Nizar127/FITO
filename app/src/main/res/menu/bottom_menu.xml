@@ -13,6 +13,11 @@
         android:id="@+id/rewards"
         android:title="@string/rewards"
         android:icon="@drawable/ic_rewards"/>
+
+    <item
+        android:id="@+id/profileID"
+        android:title="Profile"
+        android:icon="@drawable/ic_baseline_person_24"/>
     <item
         android:id="@+id/more"
         android:title="@string/more"

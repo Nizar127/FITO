@@ -61,24 +61,11 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
 
         holder.Name.setText(model.getName());
         //Log.d(TAG, "query:"+ model.getName());
-
+        holder.Highlight.setText(model.getSponsoredHighlight());
         holder.SponsoredName.setText(model.getSponsoredName());
         holder.Points.setText(model.getPoints());
         Picasso.get().load(model.getImage()).into(holder.couponImg);
         //String postKey = articleModel.get(position).getKey();
-        /*holder.detailBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(),couponDetailActivity.class);
-                Log.d(TAG, "intent:"+ intent);
-                String detailKey = getRef(position).getKey();
-                intent.putExtra("pid", model.getPid());
-                intent.putExtra("key", detailKey);
-                v.getContext().startActivity(intent);
-                //startActivity();
-
-            }
-        });*/
 
 
         holder.redeem.setOnClickListener(new View.OnClickListener() {
@@ -283,6 +270,7 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
 
                                                                                                         }
                                                                                                     });
+
                                                                                                 }
 
                                                                                                 @Override
@@ -294,16 +282,7 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
                                                                                     }
                                                                                 });
 
-/*                                                                                HashMap<String, Object> userReadMap = new HashMap<>();
-                                                                                userReadMap.put("points",storeData);
 
-                                                                                userInitialRef.updateChildren(userReadMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                        Toast.makeText(v.getContext(), "Redeem Successful", Toast.LENGTH_SHORT).show();
-                                                                                        holder.redeem.setEnabled(false);
-                                                                                    }
-                                                                                });*/
                                                                             }else{
                                                                                 Toast.makeText(v.getContext(), "Your Points Are Not Enough", Toast.LENGTH_SHORT).show();
 
@@ -330,7 +309,17 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
                                 }
                             });
 
+                        //update the coupon to be used
+                            Object used = "yes";
+                            HashMap<String, Object> couponUsedMap = new HashMap<>();
+                            couponUsedMap.put("used", used);
 
+                            couponRef.updateChildren(couponUsedMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                }
+                            });
 
 
 
@@ -387,7 +376,7 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
 
     class couponViewHolder extends RecyclerView.ViewHolder {
 
-        TextView Name, SponsoredName, Points;
+        TextView Name, SponsoredName, Points, Highlight;
         //TextView couponName, sponsoredName, points;
         ImageView couponImg;
         Button redeem, detailBtn;
@@ -395,11 +384,11 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
             super(itemView);
 
             couponImg = itemView.findViewById(R.id.couponImage);
+            Highlight = itemView.findViewById(R.id.couponHighlight);
             Name = itemView.findViewById(R.id.couponName);
             SponsoredName = itemView.findViewById(R.id.couponSponsoredName);
             Points = itemView.findViewById(R.id.textPoints);
             redeem = itemView.findViewById(R.id.redeemBtn);
-            detailBtn = itemView.findViewById(R.id.viewDetailBtn);
         }
     }
 }

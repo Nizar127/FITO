@@ -3,6 +3,7 @@ package com.blessapp.fito;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -40,10 +41,12 @@ public class Coupon_Redemption extends AppCompatActivity {
     TextView points;
     RecyclerView recyclerView;
     couponlistAdapter Adapter;
-    DatabaseReference mBase, couponDB, checkData;
+    DatabaseReference mBase, couponDB, checkData, theDb;
     FirebaseDatabase firebaseDatabase;
     coupon coupon;
     String userID;
+    ImageView backpressBtn;
+
    // ImageView coupon;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,18 +54,27 @@ public class Coupon_Redemption extends AppCompatActivity {
         setContentView(R.layout.activity_coupon__redemption);
 
 
+        backpressBtn = findViewById(R.id.backpressed);
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Coupon");
         String key = dbRef.child("Coupon").push().getKey();
         Log.d(TAG, "query:"+ key);
         //coupon = findViewById(R.id.couponBtn);
         points = findViewById(R.id.pointID);
 
+        backpressBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
         userID = FirebaseAuth.getInstance().getUid();
         coupon = new coupon();
 
 
         mBase = FirebaseDatabase.getInstance().getReference("Coupon");
-        couponDB = FirebaseDatabase.getInstance().getReference("User").child(userID);
+        theDb =  FirebaseDatabase.getInstance().getReference("Coupon").child(key);
+        //couponDB = FirebaseDatabase.getInstance().getReference("User").child(userID);
         try{
             checkData = FirebaseDatabase.getInstance().getReference("User").child(userID);
             checkData.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
@@ -101,8 +113,9 @@ public class Coupon_Redemption extends AppCompatActivity {
 
 
         recyclerView = findViewById(R.id.recyclerviewSystem);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        //recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
       FirebaseRecyclerOptions<coupon> options = new FirebaseRecyclerOptions.Builder<coupon>()
                 //.setQuery(mBase, GenericTypeIndicator.class)
               .setQuery(mBase, new SnapshotParser<com.blessapp.fito.model.coupon>() {
@@ -112,6 +125,7 @@ public class Coupon_Redemption extends AppCompatActivity {
                       coupon coupondata = new coupon();
                       coupondata.setName(snapshot.child("Coupon_name").getValue().toString());
                       coupondata.setSponsoredName(snapshot.child("Sponsored_Name").getValue().toString());
+                      coupondata.setSponsoredHighlight(snapshot.child("Coupon_Highlight").getValue().toString());
                       coupondata.setImage(snapshot.child("image").getValue().toString());
                       coupondata.setPoints(snapshot.child("Points").getValue().toString());
                       return coupondata;
