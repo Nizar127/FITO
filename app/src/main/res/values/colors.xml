@@ -8,4 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="success">#22FD0E</color>
+    <color name="divider">#B0B0B0</color>
+    <color name="red">#FF0303</color>
+    <color name="main">#FFE88A</color>
+    <color name="green">#26CC00</color>
 </resources>

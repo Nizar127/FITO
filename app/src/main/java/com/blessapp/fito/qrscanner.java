@@ -7,6 +7,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,8 +34,13 @@ import static androidx.constraintlayout.motion.widget.MotionScene.TAG;
 
 public class qrscanner extends AppCompatActivity implements ZXingScannerView.ResultHandler{
     ZXingScannerView scannerView;
-    DatabaseReference dbref;
+    DatabaseReference dbref, originalCouponRef;
     String UserID;
+    String addData = "";
+    int TotalData = 0;
+    int newData =0;
+    String storeData = "";
+    int intialData =0;
 
 
     @Override
@@ -55,6 +61,7 @@ public class qrscanner extends AppCompatActivity implements ZXingScannerView.Res
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
                         scannerView.startCamera();
+
                     }
 
                     @Override
@@ -73,37 +80,55 @@ public class qrscanner extends AppCompatActivity implements ZXingScannerView.Res
     @Override
     public void handleResult(Result rawResult) {
         //String data=rawResult.getText().toString();
+
         String data = rawResult.getText();
+        Log.d(TAG, "QR Points:"+ data);
+        intialData = Integer.parseInt(data);
         String newPoints = "";
         String initialPoints = "";
         HashMap<String, Object> userMap = new HashMap<>();
         userMap.put("points",data);
         String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference scannerDataRef = FirebaseDatabase.getInstance().getReference("User").child(userID).child("points");
+        //DatabaseReference scannerDataRef = FirebaseDatabase.getInstance().getReference("User").child(userID).child("points");
 
-        dbref.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+        if(data != null){
+            dbref.child("points").setValue(data);
+        }else{
+            dbref.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    HomeActivity.qr.setText(data);
+                }
+            });
+        }
+
+        // scannerView.stopCamera();
+        //String newPoints = "";
+        //String initialPoints = "";
+/*        String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference scannerDataRef = FirebaseDatabase.getInstance().getReference("User").child(userID);
+        scannerDataRef.child("points").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                   HomeActivity.qr.setText(data);
-            }
-        });
-
-
-
-/*        dbref.push().setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                //FragmentHome.qr.setText("Data Inserted Successfully");
-                dbref.addValueEventListener(new ValueEventListener() {
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                scannerDataRef.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        String newpoint = dataSnapshot.child("points").getValue().toString();
-                        //String getData = snapshot.child(UserID).child("points").getValue(String.class);
-                        Log.d(TAG, "Get Data:" + newpoint);
-                        HomeActivity.qr.setText(newpoint);
-                        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                        intent.putExtra("points", newpoint);
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Log.d(TAG, "temp data:"+snapshot);
 
+                        Object importData = snapshot.child("points").getValue();
+                        if(importData != null){
+                            //if data is exist
+                            Log.d(TAG, "points 1:"+ importData);
+                            String initialPoint ="";
+                            initialPoint = importData.toString();
+                            addData = initialPoint;
+                            //newData = Integer.parseInt(addData);
+                            Log.d(TAG, "Big Points:"+ addData);
+
+                        } else{
+                                //if data is not exist
+                            newData = 0;
+                        }
                     }
 
                     @Override
@@ -111,11 +136,46 @@ public class qrscanner extends AppCompatActivity implements ZXingScannerView.Res
 
                     }
                 });
-                //HomeActivity.qr.setText("Data Inserted Successfully");
-                onBackPressed();
+            }
+        });
+
+        //if add data is not empty, add the previous item
+    if(addData != null){
+        //add data inside
+        scannerView.stopCamera();
+        TotalData = Integer.parseInt(addData) + Integer.parseInt(data);
+        storeData = String.valueOf(TotalData);
+        //once scan, close camera
+        Log.d(TAG, "Total Data:"+ storeData);
+        //scannerDataRef.child("points").setValue(storeData);
+        //HomeActivity.qr.setText(storeData);
+
+    }else{
+
+        //if data is still new
+        HashMap<String, Object> userMap = new HashMap<>();
+        userMap.put("points",data);
+        scannerDataRef.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                HomeActivity.qr.setText(data);
             }
         });*/
+
     }
+
+
+
+/*        dbref.updateChildren(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                HomeActivity.qr.setText(data);
+            }
+        });*/
+
+
+
+
 
     @Override
     protected void onPause() {

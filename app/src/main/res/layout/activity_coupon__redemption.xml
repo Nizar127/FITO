@@ -8,21 +8,33 @@
     android:orientation="vertical"
     tools:context=".Coupon_Redemption">
 
-    <TextView
-        android:id="@+id/qrtext"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginBottom="20dp"
-        android:fontFamily="@font/bowlby_one_sc"
-        android:gravity="center"
-        android:text="REDEEM"
-        android:textColor="#423A30"
-        android:textSize="34sp" />
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/backpressed"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/arrow_back"/>
+
+        <TextView
+            android:id="@+id/qrtext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="20dp"
+            android:fontFamily="@font/bowlby_one_sc"
+            android:gravity="center"
+            android:text="REDEEM"
+            android:textColor="#423A30"
+            android:textSize="34sp" />
+    </LinearLayout>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -87,9 +99,6 @@
 <!--
     used this in case you want horizontal view
 -->
-    <HorizontalScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -100,11 +109,10 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerviewSystem"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
 
-    </HorizontalScrollView>
 
 
 

@@ -30,7 +30,9 @@ public class CouponUsedAdapter extends FirebaseRecyclerAdapter<couponUsed, Coupo
     protected void onBindViewHolder(@NonNull couponUsedViewHolder holder, int position, @NonNull couponUsed model) {
         holder.NameUsed.setText(model.getName());
         //Log.d(TAG, "query:"+ model.getName());
-
+        holder.usedTerm.setText(model.getSponsoredTerm());
+        holder.Desc.setText(model.getSponsoredHighlight());
+        holder.Valid.setText(model.getCoupon_validity());
         holder.SponsoredNameUsed.setText(model.getSponsoredName());
         holder.PointsUsed.setText(model.getPoints());
         Picasso.get().load(model.getImage()).into(holder.couponImg);
@@ -44,13 +46,16 @@ public class CouponUsedAdapter extends FirebaseRecyclerAdapter<couponUsed, Coupo
     }
 
     class couponUsedViewHolder extends RecyclerView.ViewHolder{
-        TextView NameUsed, SponsoredNameUsed, PointsUsed;
+        TextView NameUsed, SponsoredNameUsed, PointsUsed, Valid, Desc, usedTerm;
         //TextView couponName, sponsoredName, points;
         ImageView couponImg;
         Button used;
         public couponUsedViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            usedTerm = itemView.findViewById(R.id.couponusedTerm);
+            Valid = itemView.findViewById(R.id.couponValidity);
+            Desc = itemView.findViewById(R.id.couponusedHighlight);
             couponImg = itemView.findViewById(R.id.morecouponImage);
             NameUsed = itemView.findViewById(R.id.morecouponName);
             SponsoredNameUsed = itemView.findViewById(R.id.morecouponSponsoredName);

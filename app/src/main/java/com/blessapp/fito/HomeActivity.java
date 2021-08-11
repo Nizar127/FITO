@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -30,9 +31,9 @@ public class HomeActivity extends AppCompatActivity {
     String userID;
     Button scannerMe;
     public static TextView qr;
-    TextView powerpoint;
+    TextView powerpoint, distanceID, oil_valueID;
     BottomNavigationView bottomtabmenu;
-    DatabaseReference ref, checkData;
+    DatabaseReference ref, checkData, testOil, testdistance;
     FirebaseAuth fAuth = FirebaseAuth.getInstance();
 
     @Override
@@ -41,8 +42,11 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home2);
 
         qr = findViewById(R.id.qrtext);
+        distanceID = findViewById(R.id.distanceID);
+        oil_valueID = findViewById(R.id.oil_valueID);
 
         powerpoint = findViewById(R.id.pinpointID);
+
 
 
 
@@ -51,63 +55,22 @@ public class HomeActivity extends AppCompatActivity {
         Log.d(TAG, "query:"+ userID);
 
         ref = FirebaseDatabase.getInstance().getReference("User").child(userID);
+
         try{
-            checkData = FirebaseDatabase.getInstance().getReference("User").child(userID);
-            checkData.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    if(task.getResult().exists()){
-                        Log.d(TAG, "check data:"+ checkData);
-                        checkData.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Object importData = dataSnapshot.child("points").getValue();
-                                if(importData != null){
-                                    powerpoint.setText(importData.toString());
-                                }
+           // checkingData();
+            checkingOil();
+            checkingDistance();
 
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
-                }
-            });
-
-        }catch (Exception e){
-            Log.d(TAG, "Error: "+e);
+        }catch (Exception data){
+            data.printStackTrace();
+            Log.d(TAG, "Error: "+data);
+            Toast.makeText(getApplicationContext(), "No data there", Toast.LENGTH_SHORT).show();
         }
-
-
-
-
 
 
         Query qrcode = ref.child(userID);
         Log.d(TAG, "query:"+ qrcode);
 
-/*       qrcode.addValueEventListener(new ValueEventListener() {
-           @Override
-           public void onDataChange(@NonNull DataSnapshot snapshot) {
-               if(snapshot.exists()){
-                    String fed = snapshot.child(userID).getKey();
-                    if(fed.equals(userID)){
-                        String itemQR = snapshot.child("points").getValue(String.class);
-                        qr.setText(itemQR);
-                        Intent intent = new Intent(getApplicationContext(), RewardsActivity.class);
-                        intent.putExtra("points", itemQR);
-                    }
-               }
-           }
-
-           @Override
-           public void onCancelled(@NonNull DatabaseError error) {
-
-           }
-       });*/
 
         scannerMe = findViewById(R.id.scanbutton);
 
@@ -137,6 +100,10 @@ public class HomeActivity extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), RewardsActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
+                    case R.id.profileID:
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                        overridePendingTransition(0,0);
+                        return true;
                     case R.id.more:
                         startActivity(new Intent(getApplicationContext(), MoreActivity.class));
                         overridePendingTransition(0, 0);
@@ -149,5 +116,82 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void checkingDistance() {
+        testdistance = FirebaseDatabase.getInstance().getReference("distance");
+        testdistance.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.getResult().exists()){
+                    testdistance.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            Object distance = snapshot.getValue();
+                            if(distance != null){
+                                distanceID.setText(distance.toString()+ " "+"CM");
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull  DatabaseError error) {
+
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void checkingOil() {
+        testOil = FirebaseDatabase.getInstance().getReference("distance");
+        testOil.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.getResult().exists()){
+                    testOil.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            Object oilvalue = snapshot.getValue();
+                            if(oilvalue != null){
+                                oil_valueID.setText(oilvalue.toString()+ " "+"ML");
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void checkingData() {
+        checkData = FirebaseDatabase.getInstance().getReference("User").child(userID);
+        checkData.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.getResult().exists()){
+                    Log.d(TAG, "check data:"+ checkData);
+                    checkData.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Object importData = dataSnapshot.child("points").getValue();
+                            if(importData != null){
+                                powerpoint.setText(importData.toString());
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            }
+        });
     }
 }

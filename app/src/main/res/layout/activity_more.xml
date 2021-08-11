@@ -23,67 +23,52 @@
         android:textSize="34sp"
         tools:ignore="HardcodedText" />
 
-    <LinearLayout
-        android:id="@+id/pointMoreBox"
-        android:layout_width="230dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/morewords"
-        android:background="@drawable/circular_point"
-        android:layout_marginStart="30dp"
-        android:orientation="horizontal">
 
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="13dp"
-            android:src="@drawable/ic_giftcard" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="125dp"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="Points"
-                android:textAlignment="center"
-                android:textSize="23sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/pinpointID"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="10dp"
-                android:text="dads"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginEnd="20dp"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
+    <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:orientation="vertical"
-        android:layout_below="@+id/pointMoreBox"
-        android:layout_margin="10dp"
-        android:padding="10dp"
-        android:layout_marginTop="50dp">
+        android:layout_height="3dp"
+        android:layout_below="@+id/morewords"
+        android:background="@color/divider" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerviewMore"
+    <LinearLayout
+        android:id="@+id/redeemSystem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/morewords">
+
+        <TextView
+            android:id="@+id/redeem"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="59dp"
+            android:layout_below="@+id/divider"
+            android:fontFamily="@font/bowlby_one_sc"
+            android:layout_marginStart="10dp"
+            android:text="Redeem"
+            android:textColor="#423A30"
+            android:textSize="34sp"
+            tools:ignore="HardcodedText" />
+
+<!--        <ImageView
+            android:id="@+id/test"
+            android:layout_width="70dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/morewords"
+            android:src="@drawable/go_to"/>-->
+
     </LinearLayout>
+
+
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/redeem"
+        android:background="@color/divider" />
+
+
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -101,5 +86,7 @@
 
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+
 
 </RelativeLayout>
