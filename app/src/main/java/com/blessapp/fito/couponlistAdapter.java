@@ -68,7 +68,6 @@ public class couponlistAdapter extends FirebaseRecyclerAdapter<coupon, couponlis
         //String postKey = articleModel.get(position).getKey();
 
 
-
         holder.redeem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
